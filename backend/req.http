@@ -1,0 +1,28 @@
+
+//create new user
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Test Patient",
+  "email": "testpatient@example.com",
+  "password": "TestPassword123",
+  "phone": "9876543210"
+}
+
+###
+//login
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "testpatient@example.com",
+  "password": "TestPassword123"
+}
+
+
+###
+//check the logged in user
+GET http://localhost:5000/api/auth/me
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOTdlZDNhYjcwOGYzNjAzMWJiYzMzNCIsInJvbGUiOiJwYXRpZW50IiwiaWF0IjoxNzg4MzQyMDMzLCJleHAiOjE3ODg5NDY4MzN9.uhQM7tC_kQ01TJ7oHOFPOlXHoxxFMkZKOwhaLL4GrkQ
+
