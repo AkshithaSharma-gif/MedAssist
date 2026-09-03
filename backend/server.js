@@ -9,6 +9,7 @@ import patientRouter from "./APIs/PatientAPI.js";
 import doctorRouter from "./APIs/DoctorAPI.js";
 import serviceRouter from "./APIs/ServiceAPI.js";
 import appointmentRouter from "./APIs/AppointmentAPI.js";
+import medicalRecordRouter from "./APIs/MedicalRecordAPI.js";
 
 import connectDB from "./config/db.js";
 
@@ -33,6 +34,7 @@ app.use("/api/patients", patientRouter);
 app.use("/api/doctors", doctorRouter);
 app.use("/api/services", serviceRouter);
 app.use("/api/appointments", appointmentRouter);
+app.use("/api/medical-records", medicalRecordRouter);
 
 
 // Test route
