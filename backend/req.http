@@ -84,6 +84,27 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOThmMWFkO
 
 
 ###
+//admin creates department
+POST http://localhost:5000/api/departments
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOThmMWFkOWQzMTk3OTE2M2ViZDMyOCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc4ODQwOTc2OCwiZXhwIjoxNzg5MDE0NTY4fQ.K8dE94T0Np2zy088-gNwq7-af7Lf8nVk9rErZPZHH4s
+
+{
+  "name": "Gynacology",
+  "description": "Child birth...Mother and Child care"
+}
+
+
+//get all depARTMENTS
+###
+###
+GET http://localhost:5000/api/departments
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOThmMWFkOWQzMTk3OTE2M2ViZDMyOCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc4ODQxMDA2NSwiZXhwIjoxNzg5MDE0ODY1fQ.C4Q9k2BiXX6qEKBy3r1GALxoWnQU4smIZM2XSPWd3ao
+
+
+
+
+###
 //receptionist log in
 
 POST http://localhost:5000/api/auth/login
