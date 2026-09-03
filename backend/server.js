@@ -6,6 +6,7 @@ import morgan from "morgan";
 import authRouter from "./APIs/AuthAPI.js";
 import departmentRouter from "./APIs/DepartmentAPI.js";
 import patientRouter from "./APIs/PatientAPI.js";
+import doctorRouter from "./APIs/DoctorAPI.js";
 
 import connectDB from "./config/db.js";
 
@@ -27,6 +28,7 @@ app.use(morgan("dev"));
 app.use("/api/auth", authRouter);
 app.use("/api/departments", departmentRouter);
 app.use("/api/patients", patientRouter);
+app.use("/api/doctors", doctorRouter);
 
 
 // Test route
