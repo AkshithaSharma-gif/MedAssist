@@ -165,4 +165,131 @@ router.get("/me", verifyToken, async (req, res) => {
 });
 
 
+
+// STAFF REGISTERS A PATIENT
+
+router.post(
+  "/register-patient",
+  verifyToken,
+  authorizeRoles("receptionist", "admin"),
+  async (req, res) => {
+    try {
+      const { name, email, password, phone } = req.body;
+
+      if (!name || !email || !password) {
+        return res.status(400).json({
+          success: false,
+          message: "Name, email and password are required",
+        });
+      }
+
+      const existingUser = await User.findOne({ email });
+
+      if (existingUser) {
+        return res.status(409).json({
+          success: false,
+          message: "User already exists with this email",
+        });
+      }
+
+      const user = await User.create({
+        name,
+        email,
+        password,
+        phone,
+        role: "patient",
+      });
+
+      res.status(201).json({
+        success: true,
+        message: "Patient registered successfully by staff",
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Patient registration failed",
+        error: error.message,
+      });
+    }
+  }
+);
+
+
+
+// ADMIN CREATES STAFF ACCOUNTS
+
+router.post(
+  "/create-staff",
+  verifyToken,
+  authorizeRoles("admin"),
+  async (req, res) => {
+    try {
+      const { name, email, password, phone, role } = req.body;
+
+      const allowedStaffRoles = [
+        "doctor",
+        "receptionist",
+        "lab_technician",
+      ];
+
+      if (!name || !email || !password || !role) {
+        return res.status(400).json({
+          success: false,
+          message: "Name, email, password and role are required",
+        });
+      }
+
+      if (!allowedStaffRoles.includes(role)) {
+        return res.status(400).json({
+          success: false,
+          message:
+            "Invalid staff role. Allowed roles are doctor, receptionist and lab_technician",
+        });
+      }
+
+      const existingUser = await User.findOne({ email });
+
+      if (existingUser) {
+        return res.status(409).json({
+          success: false,
+          message: "User already exists with this email",
+        });
+      }
+
+      const user = await User.create({
+        name,
+        email,
+        password,
+        phone,
+        role,
+      });
+
+      res.status(201).json({
+        success: true,
+        message: `${role} account created successfully`,
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          role: user.role,
+        },
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Staff account creation failed",
+        error: error.message,
+      });
+    }
+  }
+);
+
+
+
 export default router;

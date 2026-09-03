@@ -4,14 +4,14 @@ POST http://localhost:5000/api/auth/register
 Content-Type: application/json
 
 {
-  "name": "Test Patient",
-  "email": "testpatient@example.com",
-  "password": "TestPassword123",
-  "phone": "9876543210"
+  "name": "Test Patient 2",
+  "email": "testpatient2@example.com",
+  "password": "TestPassword1234",
+  "phone": "9876543216"
 }
 
 ###
-//login
+//login as patient
 POST http://localhost:5000/api/auth/login
 Content-Type: application/json
 
@@ -26,3 +26,87 @@ Content-Type: application/json
 GET http://localhost:5000/api/auth/me
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOTdlZDNhYjcwOGYzNjAzMWJiYzMzNCIsInJvbGUiOiJwYXRpZW50IiwiaWF0IjoxNzg4MzQyMDMzLCJleHAiOjE3ODg5NDY4MzN9.uhQM7tC_kQ01TJ7oHOFPOlXHoxxFMkZKOwhaLL4GrkQ
 
+###
+//create initial admin
+POST http://localhost:5000/api/auth/setup-admin
+Content-Type: application/json
+
+{
+  "name": "Clinic Admin",
+  "email": "admin@medassist.com",
+  "password": "AdminPassword123",
+  "phone": "9999999999"
+}
+
+
+###
+//login as admin
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@medassist.com",
+  "password": "AdminPassword123"
+}
+
+
+
+###
+//admin creates doctor
+
+POST http://localhost:5000/api/auth/create-staff
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOThmMWFkOWQzMTk3OTE2M2ViZDMyOCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc4ODQwODM1NCwiZXhwIjoxNzg5MDEzMTU0fQ.kRno-pfUoLfdoSpBR_EkQdnLMNBP8y5HSqU_XxCcWMk
+
+{
+  "name": "Dr Test",
+  "email": "doctor@medassist.com",
+  "password": "DoctorPassword123",
+  "phone": "8888888888",
+  "role": "doctor"
+}
+
+
+
+###
+//admin creates receiptionist
+POST http://localhost:5000/api/auth/create-staff
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOThmMWFkOWQzMTk3OTE2M2ViZDMyOCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc4ODQwODM1NCwiZXhwIjoxNzg5MDEzMTU0fQ.kRno-pfUoLfdoSpBR_EkQdnLMNBP8y5HSqU_XxCcWMk
+
+{
+  "name": "Test Receptionist",
+  "email": "reception@medassist.com",
+  "password": "ReceptionPassword123",
+  "phone": "7777777777",
+  "role": "receptionist"
+}
+
+
+###
+//receptionist log in
+
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "reception@medassist.com",
+  "password": "ReceptionPassword123"
+}
+
+
+
+###
+//receiptionist creates a patient
+###
+
+POST http://localhost:5000/api/auth/register-patient
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOThmMjc4OWQzMTk3OTE2M2ViZDMyYSIsInJvbGUiOiJyZWNlcHRpb25pc3QiLCJpYXQiOjE3ODg0MDg1NzUsImV4cCI6MTc4OTAxMzM3NX0.QpJ-ZcnUZpYRVdCXZvpE-OGCSO_Ay6sf5fqX6ETJBVM
+
+{
+  "name": "Clinic Patient",
+  "email": "clinicpatient@example.com",
+  "password": "PatientPassword123",
+  "phone": "6666666666"
+}
