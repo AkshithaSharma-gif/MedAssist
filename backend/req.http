@@ -59,9 +59,9 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOThmMWFkOWQzMTk3OTE2M2ViZDMyOCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc4ODQwODM1NCwiZXhwIjoxNzg5MDEzMTU0fQ.kRno-pfUoLfdoSpBR_EkQdnLMNBP8y5HSqU_XxCcWMk
 
 {
-  "name": "Dr Test",
-  "email": "doctor@medassist.com",
-  "password": "DoctorPassword123",
+  "name": "Dr Test 2",
+  "email": "doctor2@medassist.com",
+  "password": "DoctorPassword123456",
   "phone": "8888888888",
   "role": "doctor"
 }
@@ -193,3 +193,68 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOTdlZDNhY
 {
   "bloodGroup": "A+"
 }
+
+
+//create doctor profile
+###
+POST http://localhost:5000/api/doctors
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOThmMWFkOWQzMTk3OTE2M2ViZDMyOCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc4ODQxNjY5NiwiZXhwIjoxNzg5MDIxNDk2fQ.I74VtsiYXWDANJRHkua0QvvNgy16LL7piMsLaE1XkPs
+
+{
+  "userId": "6a991286a50f6c98436ad0d5",
+  "departmentId": "6a98f80c1ad6ea739b663aa7",
+  "specialization": "General Physician",
+  "qualification": "MBBS",
+  "experience": 5,
+  "consultationFee": 500,
+  "availability": [
+    {
+      "day": "monday",
+      "startTime": "09:00",
+      "endTime": "13:00",
+      "isAvailable": true
+    },
+    {
+      "day": "wednesday",
+      "startTime": "09:00",
+      "endTime": "13:00",
+      "isAvailable": true
+    }
+  ]
+}
+
+
+###
+//login as doctor
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "doctor2@medassist.com",
+  "password": "DoctorPassword123456"
+}
+
+###
+//get doctor own profile
+GET http://localhost:5000/api/doctors/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOTkxMjg2YTUwZjZjOTg0MzZhZDBkNSIsInJvbGUiOiJkb2N0b3IiLCJpYXQiOjE3ODg0MTY4MjMsImV4cCI6MTc4OTAyMTYyM30.MIT5ExUXU5L152IX8Ye5CwG325AT_kKODxDGD8C0_zQ
+
+
+
+###
+//add a service
+###
+POST http://localhost:5000/api/services
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOThmMWFkOWQzMTk3OTE2M2ViZDMyOCIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc4ODQxNzAxMCwiZXhwIjoxNzg5MDIxODEwfQ.6b4AZsSHq68OuoejQouax2h2WTLKyxE1XqQAxWytqWE
+
+{
+  "name": "General Consultation",
+  "departmentId": "6a98f80c1ad6ea739b663aa7",
+  "description": "General medical consultation",
+  "price": 500,
+  "duration": 30
+}
+
+
