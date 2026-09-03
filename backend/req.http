@@ -123,11 +123,73 @@ Content-Type: application/json
 
 POST http://localhost:5000/api/auth/register-patient
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOThmMjc4OWQzMTk3OTE2M2ViZDMyYSIsInJvbGUiOiJyZWNlcHRpb25pc3QiLCJpYXQiOjE3ODg0MDg1NzUsImV4cCI6MTc4OTAxMzM3NX0.QpJ-ZcnUZpYRVdCXZvpE-OGCSO_Ay6sf5fqX6ETJBVM
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOThmMjc4OWQzMTk3OTE2M2ViZDMyYSIsInJvbGUiOiJyZWNlcHRpb25pc3QiLCJpYXQiOjE3ODg0MTIyMjgsImV4cCI6MTc4OTAxNzAyOH0.eWylmtSEI2ewXFiEJoUmPukwSEVECwx-ymfaUagNtGc
 
 {
-  "name": "Clinic Patient",
-  "email": "clinicpatient@example.com",
-  "password": "PatientPassword123",
+  "name": "Clinic Patient 2",
+  "email": "clinicpatient2@example.com",
+  "password": "PatientPassword12345",
   "phone": "6666666666"
+}
+
+
+###
+POST http://localhost:5000/api/patients
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOThmMjc4OWQzMTk3OTE2M2ViZDMyYSIsInJvbGUiOiJyZWNlcHRpb25pc3QiLCJpYXQiOjE3ODg0MTIyMjgsImV4cCI6MTc4OTAxNzAyOH0.eWylmtSEI2ewXFiEJoUmPukwSEVECwx-ymfaUagNtGc
+
+{
+  "userId": "6a99016662caf60c1435c9ad",
+  "dateOfBirth": "2005-06-15",
+  "gender": "female",
+  "bloodGroup": "O+"
+}
+
+
+
+###
+//create patient profile
+POST http://localhost:5000/api/patients/profile
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOTdlZDNhYjcwOGYzNjAzMWJiYzMzNCIsInJvbGUiOiJwYXRpZW50IiwiaWF0IjoxNzg4NDExODM5LCJleHAiOjE3ODkwMTY2Mzl9.A6XtvtmlwfxBAVkUsYyv5soP1JkZviWUaHf7IYh_6uM
+
+{
+  "dateOfBirth": "2005-06-15",
+  "gender": "female",
+  "bloodGroup": "O+",
+  "address": {
+    "street": "Sample Street",
+    "city": "Hyderabad",
+    "state": "Telangana",
+    "postalCode": "500001"
+  },
+  "emergencyContact": {
+    "name": "Emergency Contact",
+    "relationship": "Parent",
+    "phone": "9000000000"
+  },
+  "medicalInformation": {
+    "allergies": ["None"],
+    "chronicConditions": [],
+    "notes": ""
+  }
+}
+
+
+
+###
+//get own patient profile
+GET http://localhost:5000/api/patients/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOTdlZDNhYjcwOGYzNjAzMWJiYzMzNCIsInJvbGUiOiJwYXRpZW50IiwiaWF0IjoxNzg4NDExOTIwLCJleHAiOjE3ODkwMTY3MjB9.UHc94SctATO0OSynGSVW26Hz5tW7ZE_cxCQG3wSgnTk
+
+
+###
+//update own patient profile
+
+PUT http://localhost:5000/api/patients/profile
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOTdlZDNhYjcwOGYzNjAzMWJiYzMzNCIsInJvbGUiOiJwYXRpZW50IiwiaWF0IjoxNzg4NDExOTIwLCJleHAiOjE3ODkwMTY3MjB9.UHc94SctATO0OSynGSVW26Hz5tW7ZE_cxCQG3wSgnTk
+
+{
+  "bloodGroup": "A+"
 }
