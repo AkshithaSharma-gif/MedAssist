@@ -12,8 +12,10 @@ import appointmentRouter from "./APIs/AppointmentAPI.js";
 import medicalRecordRouter from "./APIs/MedicalRecordAPI.js";
 import invoiceRouter from "./APIs/InvoiceAPI.js";
 import dashboardRouter from "./APIs/DashboardAPI.js";
+import notificationRouter from "./APIs/NotificationAPI.js";
 
 import connectDB from "./config/db.js";
+
 
 dotenv.config();
 connectDB();
@@ -39,6 +41,7 @@ app.use("/api/appointments", appointmentRouter);
 app.use("/api/medical-records", medicalRecordRouter);
 app.use("/api/invoices", invoiceRouter);
 app.use("/api/dashboard", dashboardRouter);
+app.use("/api/notifications", notificationRouter);
 
 
 // Test route

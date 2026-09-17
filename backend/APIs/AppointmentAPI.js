@@ -6,6 +6,7 @@ import Department from "../models/DepartmentModel.js";
 import Service from "../models/ServiceModel.js";
 import verifyToken from "../Middlewares/verifyToken.js";
 import authorizeRoles from "../Middlewares/roleAuthorization.js";
+import Notification from "../models/NotificationModel.js";
 
 const router = express.Router();
 
@@ -296,6 +297,14 @@ router.post(
         status: "scheduled",
       });
 
+      await Notification.create({
+  userId: req.user._id,
+  type: "appointment_booked",
+  title: "Appointment Booked",
+  message: `Your appointment has been booked successfully for ${appointment.appointmentDate} at ${appointment.startTime}.`,
+  appointmentId: appointment._id,
+});
+
       res.status(201).json({
         success: true,
         message: "Appointment booked successfully",
@@ -419,37 +428,168 @@ router.get(
   }
 );
 
+// // ===============================
+// // GET ALL APPOINTMENTS
+// // ADMIN / RECEPTIONIST
+// // ===============================
+// router.get(
+//   "/",
+//   verifyToken,
+//   authorizeRoles("admin", "receptionist"),
+//   async (req, res) => {
+//     try {
+//       const appointments = await Appointment.find()
+//         .populate({
+//           path: "patientId",
+//           populate: {
+//             path: "userId",
+//             select: "name email phone",
+//           },
+//         })
+//         .populate({
+//           path: "doctorId",
+//           populate: {
+//             path: "userId",
+//             select: "name email phone",
+//           },
+//         })
+//         .populate("departmentId", "name")
+//         .populate("serviceId", "name price duration")
+//         .sort({
+//           appointmentDate: -1,
+//           startTime: -1,
+//         });
+
+//       res.status(200).json({
+//         success: true,
+//         count: appointments.length,
+//         appointments,
+//       });
+//     } catch (error) {
+//       res.status(500).json({
+//         success: false,
+//         message: "Failed to retrieve appointments",
+//         error: error.message,
+//       });
+//     }
+//   }
+// );
+
 // ===============================
-// GET ALL APPOINTMENTS
-// ADMIN / RECEPTIONIST
+// GET APPOINTMENTS
 // ===============================
 router.get(
   "/",
   verifyToken,
-  authorizeRoles("admin", "receptionist"),
   async (req, res) => {
     try {
-      const appointments = await Appointment.find()
-        .populate({
-          path: "patientId",
-          populate: {
-            path: "userId",
-            select: "name email phone",
-          },
-        })
-        .populate({
-          path: "doctorId",
-          populate: {
-            path: "userId",
-            select: "name email phone",
-          },
-        })
-        .populate("departmentId", "name")
-        .populate("serviceId", "name price duration")
-        .sort({
-          appointmentDate: -1,
-          startTime: -1,
+      let appointments;
+
+      // ===============================
+      // ADMIN & RECEPTIONIST
+      // VIEW ALL APPOINTMENTS
+      // ===============================
+      if (
+        req.user.role === "admin" ||
+        req.user.role === "receptionist"
+      ) {
+        appointments = await Appointment.find()
+          .populate({
+            path: "patientId",
+            populate: {
+              path: "userId",
+              select: "name email phone",
+            },
+          })
+          .populate({
+            path: "doctorId",
+            populate: {
+              path: "userId",
+              select: "name email phone",
+            },
+          })
+          .populate("departmentId", "name")
+          .populate("serviceId", "name price duration")
+          .sort({
+            appointmentDate: -1,
+            startTime: -1,
+          });
+      }
+
+      // ===============================
+      // PATIENT
+      // VIEW OWN APPOINTMENTS
+      // ===============================
+      else if (req.user.role === "patient") {
+        const patient = await Patient.findOne({
+          userId: req.user._id,
         });
+
+        if (!patient) {
+          return res.status(404).json({
+            success: false,
+            message: "Patient profile not found",
+          });
+        }
+
+        appointments = await Appointment.find({
+          patientId: patient._id,
+        })
+          .populate({
+            path: "doctorId",
+            populate: {
+              path: "userId",
+              select: "name email phone",
+            },
+          })
+          .populate("departmentId", "name")
+          .populate("serviceId", "name price duration")
+          .sort({
+            appointmentDate: -1,
+            startTime: -1,
+          });
+      }
+
+      // ===============================
+      // DOCTOR
+      // VIEW THEIR OWN APPOINTMENTS
+      // ===============================
+      else if (req.user.role === "doctor") {
+        const doctor = await Doctor.findOne({
+          userId: req.user._id,
+        });
+
+        if (!doctor) {
+          return res.status(404).json({
+            success: false,
+            message: "Doctor profile not found",
+          });
+        }
+
+        appointments = await Appointment.find({
+          doctorId: doctor._id,
+        })
+          .populate({
+            path: "patientId",
+            populate: {
+              path: "userId",
+              select: "name email phone",
+            },
+          })
+          .populate("departmentId", "name")
+          .populate("serviceId", "name price duration")
+          .sort({
+            appointmentDate: -1,
+            startTime: -1,
+          });
+      }
+
+      else {
+        return res.status(403).json({
+          success: false,
+          message: "You are not authorized",
+        });
+      }
 
       res.status(200).json({
         success: true,
@@ -457,9 +597,134 @@ router.get(
         appointments,
       });
     } catch (error) {
+      console.error("Get appointments error:", error);
+
       res.status(500).json({
         success: false,
         message: "Failed to retrieve appointments",
+        error: error.message,
+      });
+    }
+  }
+);
+
+
+
+
+
+router.get(
+  "/availability",
+  verifyToken,
+  authorizeRoles("patient", "receptionist", "admin", "doctor"),
+  async (req, res) => {
+    try {
+      const { doctorId, appointmentDate } = req.query;
+
+      if (!doctorId || !appointmentDate) {
+        return res.status(400).json({
+          success: false,
+          message: "doctorId and appointmentDate are required",
+        });
+      }
+
+      const selectedDate = parseAppointmentDate(appointmentDate);
+
+      if (isNaN(selectedDate.getTime())) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid appointment date",
+        });
+      }
+
+      const appointments = await Appointment.find({
+        doctorId,
+        appointmentDate: selectedDate,
+        status: {
+          $in: ["scheduled", "confirmed"],
+        },
+      }).select("startTime endTime");
+
+      res.json({
+        success: true,
+        appointments,
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        message: "Failed to fetch doctor availability",
+        error: error.message,
+      });
+    }
+  }
+);
+
+
+// cancel appointment
+
+router.put(
+  "/:id/cancel",
+  verifyToken,
+  authorizeRoles("patient"),
+  async (req, res) => {
+    try {
+      const appointment = await Appointment.findById(
+        req.params.id
+      );
+
+      if (!appointment) {
+        return res.status(404).json({
+          success: false,
+          message: "Appointment not found",
+        });
+      }
+
+      const patient = await Patient.findOne({
+        userId: req.user._id,
+      });
+
+      if (!patient) {
+        return res.status(404).json({
+          success: false,
+          message: "Patient profile not found",
+        });
+      }
+
+      if (
+        appointment.patientId.toString() !==
+        patient._id.toString()
+      ) {
+        return res.status(403).json({
+          success: false,
+          message: "You can only cancel your own appointments",
+        });
+      }
+
+      if (
+        !["scheduled", "confirmed"].includes(
+          appointment.status
+        )
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: `Appointment cannot be cancelled because its status is ${appointment.status}`,
+        });
+      }
+
+      appointment.status = "cancelled";
+
+      await appointment.save();
+
+      res.json({
+        success: true,
+        message: "Appointment cancelled successfully",
+        appointment,
+      });
+    } catch (error) {
+      console.error("Cancel appointment error:", error);
+
+      res.status(500).json({
+        success: false,
+        message: "Failed to cancel appointment",
         error: error.message,
       });
     }

@@ -238,7 +238,7 @@ Content-Type: application/json
 ###
 //get doctor own profile
 GET http://localhost:5000/api/doctors/profile
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOTkxMjg2YTUwZjZjOTg0MzZhZDBkNSIsInJvbGUiOiJkb2N0b3IiLCJpYXQiOjE3ODg0MTY4MjMsImV4cCI6MTc4OTAyMTYyM30.MIT5ExUXU5L152IX8Ye5CwG325AT_kKODxDGD8C0_zQ
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOTkxMjg2YTUwZjZjOTg0MzZhZDBkNSIsInJvbGUiOiJkb2N0b3IiLCJpYXQiOjE3ODk2MTcwMTYsImV4cCI6MTc5MDIyMTgxNn0.1Dl0hEhxmzJQl-JoWFZh-68ivmPexy8QItDZI5X-Urc
 
 
 
@@ -258,3 +258,50 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOThmMWFkO
 }
 
 
+
+###
+POST http://localhost:5000/api/patients/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOTdlZDNhYjcwOGYzNjAzMWJiYzMzNCIsInJvbGUiOiJwYXRpZW50IiwiaWF0IjoxNzg5NTMyODY1LCJleHAiOjE3OTAxMzc2NjV9.dvY6n_MI4Y7mVj_ap6uN_kcRYPi8QC675ZnbPh4VOaA
+Content-Type: application/json
+
+{
+  "dateOfBirth": "2005-01-01",
+  "gender": "prefer_not_to_say",
+  "bloodGroup": "unknown",
+  "address": {
+    "street": "",
+    "city": "",
+    "state": "",
+    "postalCode": ""
+  },
+  "emergencyContact": {
+    "name": "",
+    "relationship": "",
+    "phone": ""
+  },
+  "medicalInformation": {
+    "allergies": [],
+    "chronicConditions": [],
+    "notes": ""
+  }
+}
+
+
+###
+GET http://localhost:5000/api/patients/profile
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOTdlZDNhYjcwOGYzNjAzMWJiYzMzNCIsInJvbGUiOiJwYXRpZW50IiwiaWF0IjoxNzg5NTMyODY1LCJleHAiOjE3OTAxMzc2NjV9.dvY6n_MI4Y7mVj_ap6uN_kcRYPi8QC675ZnbPh4VOaA
+
+
+###
+GET http://localhost:5000/api/medical-records/my-records
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOTdlZDNhYjcwOGYzNjAzMWJiYzMzNCIsInJvbGUiOiJwYXRpZW50IiwiaWF0IjoxNzg5NTMyODY1LCJleHAiOjE3OTAxMzc2NjV9.dvY6n_MI4Y7mVj_ap6uN_kcRYPi8QC675ZnbPh4VOaA
+
+
+
+###
+GET http://localhost:5000/api/patients/profile
+
+
+###
+GET http://localhost:5000/api/appointments/availability?doctorId=6a991286a50f6c98436ad0d5&appointmentDate=2026-09-14
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhOTkxMjg2YTUwZjZjOTg0MzZhZDBkNSIsInJvbGUiOiJkb2N0b3IiLCJpYXQiOjE3ODk2MTk5MjMsImV4cCI6MTc5MDIyNDcyM30.Eqo8-eTMElDg1F2eiSStBaUx0hxX-5x8vCt-QTw8RCA

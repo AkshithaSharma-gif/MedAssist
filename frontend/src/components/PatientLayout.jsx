@@ -15,6 +15,17 @@ function PatientLayout() {
         <h1>MedAssist</h1>
 
         <nav>
+          {" "}
+|{" "}
+<Link to="/patient/notifications">
+  Notifications
+</Link>
+
+{" "}
+|{" "}
+<Link to="/patient/invoices">
+  My Invoices
+</Link>{" "}
           <Link to="/patient">Dashboard</Link>{" "}
           |{" "}
           <Link to="/patient/appointments">

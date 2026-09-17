@@ -2,6 +2,7 @@ import express from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/UserModel.js";
+import Patient from "../models/PatientModel.js";
 import verifyToken from "../Middlewares/verifyToken.js";
 
 import authorizeRoles from "../Middlewares/roleAuthorization.js";
@@ -40,6 +41,11 @@ router.post("/register", async (req, res) => {
       password,
       phone,
       role: "patient",
+    });
+
+    // Create linked patient profile
+    await Patient.create({
+      userId: user._id,
     });
 
     res.status(201).json({
@@ -200,6 +206,11 @@ router.post(
         role: "patient",
       });
 
+      // Create linked patient profile
+      await Patient.create({
+        userId: user._id,
+      });
+
       res.status(201).json({
         success: true,
         message: "Patient registered successfully by staff",
@@ -293,3 +304,4 @@ router.post(
 
 
 export default router;
+

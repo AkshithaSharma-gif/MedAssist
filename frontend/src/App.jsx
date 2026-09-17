@@ -12,77 +12,121 @@ import AdminDashboard from "./pages/AdminDashboard";
 import DoctorDashboard from "./pages/DoctorDashboard";
 import PatientDashboard from "./pages/PatientDashboard";
 import ReceptionistDashboard from "./pages/ReceptionistDashboard";
-import PatientLayout from "./components/PatientLayout";
+
 import BookAppointment from "./pages/BookAppointment";
 import MyAppointments from "./pages/MyAppointments";
+import Notifications from "./pages/Notifications";
+import MyInvoices from "./pages/MyInvoices";
+import MedicalRecords from "./pages/MedicalRecords";
+import Profile from "./pages/Profile";
 
 import ProtectedRoute from "./components/ProtectedRoute";
+import DashboardLayout from "./layouts/DashboardLayout";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Public routes */}
+
+        {/* ==================== PUBLIC ==================== */}
+
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 
-        {/* Admin */}
+
+        {/* ==================== ADMIN ==================== */}
+
         <Route
           path="/admin"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
-              <AdminDashboard />
+              <DashboardLayout role="admin" />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route index element={<AdminDashboard />} />
+        </Route>
 
-        {/* Doctor */}
+
+        {/* ==================== DOCTOR ==================== */}
+
         <Route
           path="/doctor"
           element={
             <ProtectedRoute allowedRoles={["doctor"]}>
-              <DoctorDashboard />
+              <DashboardLayout role="doctor" />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route index element={<DoctorDashboard />} />
+        </Route>
 
-        {/* Patient */}
-<Route
-  path="/patient"
-  element={
-    <ProtectedRoute allowedRoles={["patient"]}>
-      <PatientLayout />
-    </ProtectedRoute>
-  }
->
-  <Route index element={<PatientDashboard />} />
 
-  <Route
-    path="appointments"
-    element={<BookAppointment />}
-  />
-<Route
-  path="my-appointments"
-  element={<MyAppointments />}
-/>
+        {/* ==================== PATIENT ==================== */}
 
-</Route>
+        <Route
+          path="/patient"
+          element={
+            <ProtectedRoute allowedRoles={["patient"]}>
+              <DashboardLayout role="patient" />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<PatientDashboard />} />
 
-        {/* Receptionist */}
+          <Route
+            path="appointments"
+            element={<BookAppointment />}
+          />
+
+          <Route
+            path="my-appointments"
+            element={<MyAppointments />}
+          />
+
+          <Route
+            path="notifications"
+            element={<Notifications />}
+          />
+
+          <Route
+            path="records"
+            element={<MedicalRecords />}
+          />
+
+          <Route
+            path="invoices"
+            element={<MyInvoices />}
+          />
+
+          <Route
+            path="profile"
+            element={<Profile />}
+          />
+        </Route>
+
+
+        {/* ==================== RECEPTIONIST ==================== */}
+
         <Route
           path="/receptionist"
           element={
             <ProtectedRoute allowedRoles={["receptionist"]}>
-              <ReceptionistDashboard />
+              <DashboardLayout role="receptionist" />
             </ProtectedRoute>
           }
-        />
+        >
+          <Route index element={<ReceptionistDashboard />} />
+        </Route>
 
-        {/* Default */}
+
+        {/* ==================== DEFAULT ==================== */}
+
         <Route
           path="*"
           element={<Navigate to="/login" replace />}
         />
+
       </Routes>
     </BrowserRouter>
   );
