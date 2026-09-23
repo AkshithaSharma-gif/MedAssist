@@ -111,6 +111,8 @@ router.post(
         medicalRecord,
       });
     } catch (error) {
+      console.error("Create medical record error:", error);
+
       res.status(500).json({
         success: false,
         message: "Failed to create medical record",

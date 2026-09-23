@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
@@ -7,7 +8,7 @@ function DashboardLayout({ role }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-slate-50">
       <Sidebar
         role={role}
         mobileOpen={mobileOpen}
@@ -20,7 +21,7 @@ function DashboardLayout({ role }) {
           setMobileOpen={setMobileOpen}
         />
 
-        <main className="p-4 sm:p-6">
+        <main className="min-h-[calc(100vh-4rem)] p-4 sm:p-6">
           <Outlet />
         </main>
       </div>

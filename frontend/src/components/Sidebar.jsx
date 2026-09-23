@@ -1,3 +1,4 @@
+
 import {
   LayoutDashboard,
   CalendarDays,
@@ -145,16 +146,17 @@ function Sidebar({ role, mobileOpen, setMobileOpen }) {
       )}
 
       <aside
-        className={`fixed left-0 top-0 z-50 flex h-screen w-64 flex-col border-r bg-white transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed left-0 top-0 z-50 flex h-screen w-64 flex-col bg-white shadow-[4px_0_18px_rgba(15,23,42,0.06)] transition-transform duration-300 lg:translate-x-0 ${
           mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
-        <div className="flex h-16 items-center justify-between border-b px-5">
+        {/* BRAND */}
+        <div className="flex h-16 items-center justify-between px-5">
           <div
             className="flex cursor-pointer items-center gap-2"
             onClick={() => navigate(`/${role}`)}
           >
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-lg font-bold text-white">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600 text-lg font-bold text-white shadow-sm">
               M
             </div>
 
@@ -162,6 +164,7 @@ function Sidebar({ role, mobileOpen, setMobileOpen }) {
               <h1 className="text-lg font-bold text-gray-900">
                 MedAssist
               </h1>
+
               <p className="text-xs capitalize text-gray-500">
                 {role} Portal
               </p>
@@ -170,13 +173,14 @@ function Sidebar({ role, mobileOpen, setMobileOpen }) {
 
           <button
             onClick={() => setMobileOpen(false)}
-            className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 lg:hidden"
+            className="rounded-lg p-2 text-gray-500 transition hover:bg-gray-100 lg:hidden"
           >
             <X size={20} />
           </button>
         </div>
 
-        <nav className="flex-1 space-y-1 overflow-y-auto p-4">
+        {/* NAVIGATION */}
+        <nav className="flex-1 space-y-1 overflow-y-auto px-4 py-5">
           {links.map((link) => {
             const Icon = link.icon;
 
@@ -187,10 +191,10 @@ function Sidebar({ role, mobileOpen, setMobileOpen }) {
                 end={link.path === `/${role}`}
                 onClick={() => setMobileOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium transition ${
+                  `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition ${
                     isActive
-                      ? "bg-blue-600 text-white"
-                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
+                      ? "bg-blue-600 text-white shadow-sm"
+                      : "text-gray-600 hover:bg-slate-100 hover:text-gray-900"
                   }`
                 }
               >
@@ -201,10 +205,11 @@ function Sidebar({ role, mobileOpen, setMobileOpen }) {
           })}
         </nav>
 
-        <div className="border-t p-4">
+        {/* BOTTOM ACTIONS */}
+        <div className="mx-4 mb-4 rounded-xl bg-slate-50 p-2">
           <button
             onClick={() => navigate(`/${role}/profile`)}
-            className="mb-2 flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-gray-600 hover:bg-gray-100"
+            className="mb-1 flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-gray-600 transition hover:bg-white hover:text-gray-900 hover:shadow-sm"
           >
             <UserCircle size={19} />
             Profile
@@ -212,7 +217,7 @@ function Sidebar({ role, mobileOpen, setMobileOpen }) {
 
           <button
             onClick={handleLogout}
-            className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50"
+            className="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-medium text-red-600 transition hover:bg-red-50"
           >
             <LogOut size={19} />
             Logout
@@ -224,3 +229,4 @@ function Sidebar({ role, mobileOpen, setMobileOpen }) {
 }
 
 export default Sidebar;
+

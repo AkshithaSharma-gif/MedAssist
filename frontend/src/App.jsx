@@ -19,9 +19,22 @@ import Notifications from "./pages/Notifications";
 import MyInvoices from "./pages/MyInvoices";
 import MedicalRecords from "./pages/MedicalRecords";
 import Profile from "./pages/Profile";
+import DoctorAppointments from "./pages/DoctorAppointments";
+import DoctorPatients from "./pages/DoctorPatients";
+import DoctorMedicalRecords from "./pages/DoctorMedicalRecords";
+import DoctorNotifications from "./pages/DoctorNotifications";
+import DoctorConsultation from "./pages/DoctorConsultation";
+import AdminPatients from "./pages/AdminPatients";
+import AdminDoctors from "./pages/AdminDoctors";
+import AdminDepartments from "./pages/AdminDepartments";
+import AdminServices from "./pages/AdminServices";
+import AdminAppointments from "./pages/AdminAppointments";
+import AdminInvoices from "./pages/AdminInvoices";
+import AdminNotifications from "./pages/AdminNotifications";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
+import DoctorProfile from "./pages/DoctorProfile";
 
 function App() {
   return (
@@ -45,21 +58,44 @@ function App() {
           }
         >
           <Route index element={<AdminDashboard />} />
+          <Route path="patients" element={<AdminPatients />} />
+          <Route path="doctors" element={<AdminDoctors />} />
+          <Route path="departments" element={<AdminDepartments />} />
+          <Route path="services" element={<AdminServices />} />
+          <Route
+    path="appointments"
+    element={<AdminAppointments />}
+  />
+  <Route
+  path="invoices"
+  element={<AdminInvoices />}
+/>
+<Route
+  path="notifications"
+  element={<AdminNotifications />}
+/>
         </Route>
 
 
         {/* ==================== DOCTOR ==================== */}
 
         <Route
-          path="/doctor"
-          element={
-            <ProtectedRoute allowedRoles={["doctor"]}>
-              <DashboardLayout role="doctor" />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<DoctorDashboard />} />
-        </Route>
+  path="/doctor"
+  element={
+    <ProtectedRoute allowedRoles={["doctor"]}>
+      <DashboardLayout role="doctor" />
+    </ProtectedRoute>
+  }
+>
+  <Route index element={<DoctorDashboard />} />
+  <Route path="appointments" element={<DoctorAppointments />} />
+  <Route path="patients" element={<DoctorPatients />} />
+  <Route path="records" element={<DoctorMedicalRecords />} />
+  <Route path="notifications" element={<DoctorNotifications />} />
+  <Route path="consultation" element={<DoctorConsultation />} />
+  <Route path="profile" element={<DoctorProfile />} />
+  
+</Route>
 
 
         {/* ==================== PATIENT ==================== */}

@@ -59,7 +59,9 @@ router.post(
         !serviceId ||
         !appointmentDate ||
         !startTime
-      ) {
+      )
+      
+       {
         return res.status(400).json({
           success: false,
           message:
@@ -297,13 +299,26 @@ router.post(
         status: "scheduled",
       });
 
-      await Notification.create({
+      
+// Notification for the person who booked the appointment
+await Notification.create({
   userId: req.user._id,
   type: "appointment_booked",
   title: "Appointment Booked",
   message: `Your appointment has been booked successfully for ${appointment.appointmentDate} at ${appointment.startTime}.`,
   appointmentId: appointment._id,
 });
+
+// Notification for the selected doctor
+await Notification.create({
+  userId: doctor.userId,
+  type: "new_appointment",
+  title: "New Appointment",
+  message: `You have a new appointment scheduled for ${appointment.appointmentDate} at ${appointment.startTime}.`,
+  appointmentId: appointment._id,
+});
+
+
 
       res.status(201).json({
         success: true,

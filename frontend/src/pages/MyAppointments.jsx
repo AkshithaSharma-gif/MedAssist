@@ -25,10 +25,17 @@ function MyAppointments() {
 
       const response = await api.get("/appointments");
 
-      setAppointments(
+      const fetchedAppointments =
         response.data.appointments ||
-          response.data.data ||
-          []
+        response.data.data ||
+        [];
+
+      // Do not display cancelled appointments
+      setAppointments(
+        fetchedAppointments.filter(
+          (appointment) =>
+            appointment.status !== "cancelled"
+        )
       );
     } catch (err) {
       console.error(err);
@@ -122,14 +129,6 @@ function MyAppointments() {
             "border-slate-200 bg-slate-100 text-slate-600",
           icon: <CheckCircle2 size={15} />,
           label: "Completed",
-        };
-
-      case "cancelled":
-        return {
-          container:
-            "border-red-200 bg-red-50 text-red-600",
-          icon: <XCircle size={15} />,
-          label: "Cancelled",
         };
 
       default:
@@ -446,4 +445,3 @@ function MyAppointments() {
 }
 
 export default MyAppointments;
-
