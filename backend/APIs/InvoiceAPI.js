@@ -5,17 +5,19 @@ import Patient from "../models/PatientModel.js";
 import Service from "../models/ServiceModel.js";
 import verifyToken from "../Middlewares/verifyToken.js";
 import authorizeRoles from "../Middlewares/roleAuthorization.js";
+import Doctor from "../models/DoctorModel.js";
+import MedicalRecord from "../models/MedicalRecordModel.js";
 
 const router = express.Router();
 
 // ===============================
 // CREATE INVOICE
-// ADMIN / RECEPTIONIST
+// DOCTOR / ADMIN
 // ===============================
 router.post(
   "/",
   verifyToken,
-  authorizeRoles("admin", "receptionist"),
+  authorizeRoles("admin", "doctor"),
   async (req, res) => {
     try {
       const { appointmentId } = req.body;
@@ -37,6 +39,39 @@ router.post(
           success: false,
           message: "Appointment not found",
         });
+      }
+
+      // DOCTOR VALIDATION
+      if (req.user.role === "doctor") {
+        const doctor = await Doctor.findOne({ userId: req.user._id, isActive: true });
+        if (!doctor) {
+          return res.status(403).json({
+            success: false,
+            message: "Active doctor profile not found",
+          });
+        }
+
+        if (appointment.doctorId.toString() !== doctor._id.toString()) {
+          return res.status(403).json({
+            success: false,
+            message: "You can only generate invoices for your own appointments",
+          });
+        }
+
+        if (appointment.status !== "completed") {
+          return res.status(400).json({
+            success: false,
+            message: "Invoice can only be generated after the appointment is completed",
+          });
+        }
+
+        const medicalRecord = await MedicalRecord.findOne({ appointmentId });
+        if (!medicalRecord) {
+          return res.status(400).json({
+            success: false,
+            message: "Medical record must be created before generating an invoice",
+          });
+        }
       }
 
       // Prevent duplicate invoices
@@ -170,10 +205,18 @@ router.get(
             select: "name email phone",
           },
         })
-        .populate(
-          "appointmentId",
-          "appointmentDate startTime endTime status"
-        )
+        .populate({
+          path: "appointmentId",
+          select: "appointmentDate startTime endTime status doctorId",
+          populate: {
+            path: "doctorId",
+            select: "userId",
+            populate: {
+              path: "userId",
+              select: "name",
+            },
+          },
+        })
         .populate(
           "serviceId",
           "name description price duration"
@@ -250,7 +293,7 @@ router.get(
         if (
           !patient ||
           invoice.patientId._id.toString() !==
-            patient._id.toString()
+          patient._id.toString()
         ) {
           return res.status(403).json({
             success: false,
@@ -283,10 +326,14 @@ router.get(
 // MARK INVOICE AS PAID
 // ADMIN / RECEPTIONIST
 // ===============================
+// ===============================
+// MARK INVOICE AS PAID
+// PATIENT / ADMIN
+// ===============================
 router.put(
   "/:id/pay",
   verifyToken,
-  authorizeRoles("admin", "receptionist"),
+  authorizeRoles("patient", "admin"),
   async (req, res) => {
     try {
       const { paymentMethod } = req.body;
@@ -306,7 +353,9 @@ router.put(
         });
       }
 
-      const invoice = await Invoice.findById(req.params.id);
+      const invoice = await Invoice.findById(
+        req.params.id
+      );
 
       if (!invoice) {
         return res.status(404).json({
@@ -315,6 +364,36 @@ router.put(
         });
       }
 
+      // ==========================================
+      // PATIENT CAN ONLY PAY THEIR OWN INVOICE
+      // ==========================================
+      if (req.user.role === "patient") {
+        const patient = await Patient.findOne({
+          userId: req.user._id,
+          isActive: true,
+        });
+
+        if (!patient) {
+          return res.status(404).json({
+            success: false,
+            message: "Patient profile not found",
+          });
+        }
+
+        if (
+          invoice.patientId.toString() !==
+          patient._id.toString()
+        ) {
+          return res.status(403).json({
+            success: false,
+            message: "You are not authorized to pay this invoice",
+          });
+        }
+      }
+
+      // ==========================================
+      // PREVENT INVALID PAYMENT
+      // ==========================================
       if (invoice.paymentStatus === "paid") {
         return res.status(400).json({
           success: false,
@@ -329,6 +408,9 @@ router.put(
         });
       }
 
+      // ==========================================
+      // RECORD PAYMENT
+      // ==========================================
       invoice.paymentStatus = "paid";
       invoice.paymentMethod = paymentMethod;
       invoice.paidAt = new Date();

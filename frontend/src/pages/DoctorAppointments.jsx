@@ -20,8 +20,12 @@ function DoctorAppointments() {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [updatingId, setUpdatingId] = useState(null);
   const [statusFilter, setStatusFilter] = useState("all");
+  const [invoiceModalOpen, setInvoiceModalOpen] = useState(false);
+  const [selectedAppointmentForInvoice, setSelectedAppointmentForInvoice] = useState(null);
+  const [generatingInvoice, setGeneratingInvoice] = useState(false);
 
   const fetchAppointments = async () => {
     try {
@@ -47,7 +51,7 @@ function DoctorAppointments() {
 
       setError(
         err.response?.data?.message ||
-          "Failed to load appointments"
+        "Failed to load appointments"
       );
     } finally {
       setLoading(false);
@@ -75,7 +79,7 @@ function DoctorAppointments() {
 
       setError(
         err.response?.data?.message ||
-          "Failed to update appointment"
+        "Failed to update appointment"
       );
     } finally {
       setUpdatingId(null);
@@ -88,6 +92,37 @@ function DoctorAppointments() {
         appointment,
       },
     });
+  };
+
+  const handleGenerateInvoice = async () => {
+    try {
+      setGeneratingInvoice(true);
+      setError("");
+      setSuccess("");
+
+      await api.post("/invoices", {
+        appointmentId: selectedAppointmentForInvoice._id,
+      });
+
+      setSuccess("Invoice created successfully");
+      setInvoiceModalOpen(false);
+      setSelectedAppointmentForInvoice(null);
+
+      fetchAppointments();
+    } catch (err) {
+      console.error(err);
+
+      if (err.response?.status === 409) {
+        setError("Invoice already exists for this appointment.");
+      } else {
+        setError(err.response?.data?.message || "Failed to generate invoice");
+      }
+
+      setInvoiceModalOpen(false);
+      setSelectedAppointmentForInvoice(null);
+    } finally {
+      setGeneratingInvoice(false);
+    }
   };
 
   const formatDate = (date) => {
@@ -132,9 +167,9 @@ function DoctorAppointments() {
     statusFilter === "all"
       ? appointments
       : appointments.filter(
-          (appointment) =>
-            appointment.status === statusFilter
-        );
+        (appointment) =>
+          appointment.status === statusFilter
+      );
 
   if (loading) {
     return (
@@ -259,6 +294,13 @@ function DoctorAppointments() {
         </div>
       )}
 
+      {/* Success Message */}
+      {success && appointments.length > 0 && (
+        <div className="rounded-xl border border-green-100 bg-green-50 px-4 py-3 text-sm text-green-600">
+          {success}
+        </div>
+      )}
+
       {/* Appointment Filters */}
       <div className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -293,11 +335,10 @@ function DoctorAppointments() {
                 onClick={() =>
                   setStatusFilter(filter.value)
                 }
-                className={`rounded-lg px-4 py-2 text-sm font-medium transition ${
-                  statusFilter === filter.value
-                    ? "bg-blue-600 text-white shadow-sm"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}
+                className={`rounded-lg px-4 py-2 text-sm font-medium transition ${statusFilter === filter.value
+                  ? "bg-blue-600 text-white shadow-sm"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
               >
                 {filter.label}
               </button>
@@ -485,45 +526,112 @@ function DoctorAppointments() {
                 <div className="mt-5 flex flex-col justify-end gap-3 border-t border-gray-100 pt-5 sm:flex-row">
                   {appointment.status ===
                     "confirmed" && (
-                    <button
-                      onClick={() =>
-                        handleComplete(
+                      <button
+                        onClick={() =>
+                          handleComplete(
+                            appointment._id
+                          )
+                        }
+                        disabled={
+                          updatingId ===
                           appointment._id
-                        )
-                      }
-                      disabled={
-                        updatingId ===
-                        appointment._id
-                      }
-                      className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
-                    >
-                      <CheckCircle size={17} />
+                        }
+                        className="flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        <CheckCircle size={17} />
 
-                      {updatingId ===
-                      appointment._id
-                        ? "Completing..."
-                        : "Mark as Completed"}
-                    </button>
-                  )}
+                        {updatingId ===
+                          appointment._id
+                          ? "Completing..."
+                          : "Mark as Completed"}
+                      </button>
+                    )}
 
-                  {appointment.status ===
-                    "completed" && (
-                    <button
-                      onClick={() =>
-                        handleConsultation(
-                          appointment
-                        )
-                      }
-                      className="flex items-center justify-center gap-2 rounded-xl bg-cyan-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-cyan-700"
-                    >
-                      <FileText size={17} />
-                      Consult / Medical Record
-                    </button>
+                  {appointment.status === "completed" && (
+                    <div className="flex flex-wrap gap-2">
+                      {!appointment.hasMedicalRecord && (
+                        <button
+                          onClick={() =>
+                            handleConsultation(
+                              appointment
+                            )
+                          }
+                          className="flex items-center justify-center gap-2 rounded-xl bg-cyan-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-cyan-700"
+                        >
+                          <FileText size={17} />
+                          Consult / Medical Record
+                        </button>
+                      )}
+                      <button
+                        onClick={() => {
+                          setSelectedAppointmentForInvoice(appointment);
+                          setInvoiceModalOpen(true);
+                        }}
+                        className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                      >
+                        <FileText size={17} />
+                        Generate Invoice
+                      </button>
+                    </div>
                   )}
                 </div>
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Invoice Confirmation Modal */}
+      {invoiceModalOpen && selectedAppointmentForInvoice && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+            <h2 className="text-xl font-bold text-gray-900">Generate Invoice?</h2>
+
+            <div className="mt-4 space-y-3 rounded-xl bg-gray-50 p-4 text-sm">
+              <div className="flex justify-between">
+                <span className="text-gray-500">Patient:</span>
+                <span className="font-semibold text-gray-900">{selectedAppointmentForInvoice.patientId?.userId?.name || "Unknown"}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Service:</span>
+                <span className="font-semibold text-gray-900">{selectedAppointmentForInvoice.serviceId?.name || "Unknown"}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Appointment:</span>
+                <span className="font-semibold text-gray-900">
+                  {formatDate(selectedAppointmentForInvoice.appointmentDate)} {selectedAppointmentForInvoice.startTime}
+                </span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Amount:</span>
+                <span className="font-semibold text-gray-900">₹{selectedAppointmentForInvoice.serviceId?.price || 0}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-500">Payment Status:</span>
+                <span className="font-semibold text-amber-600">Pending</span>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setInvoiceModalOpen(false);
+                  setSelectedAppointmentForInvoice(null);
+                }}
+                disabled={generatingInvoice}
+                className="rounded-xl px-4 py-2 text-sm font-semibold text-gray-600 hover:bg-gray-100 disabled:opacity-50"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleGenerateInvoice}
+                disabled={generatingInvoice}
+                className="flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
+              >
+                {generatingInvoice ? "Generating..." : "Generate Invoice"}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

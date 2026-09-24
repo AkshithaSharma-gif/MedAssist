@@ -280,6 +280,84 @@ router.get(
 );
 
 
+
+// ===============================
+// UPDATE MEDICAL RECORD
+// DOCTOR ONLY — OWN RECORDS
+// ===============================
+router.put(
+  "/:id",
+  verifyToken,
+  authorizeRoles("doctor"),
+  async (req, res) => {
+    try {
+      const record = await MedicalRecord.findById(req.params.id);
+
+      if (!record) {
+        return res.status(404).json({
+          success: false,
+          message: "Medical record not found",
+        });
+      }
+
+      // Verify ownership: MedicalRecord.doctorId → Doctor._id → Doctor.userId → req.user._id
+      const doctor = await Doctor.findOne({
+        userId: req.user._id,
+        isActive: true,
+      });
+
+      if (!doctor) {
+        return res.status(404).json({
+          success: false,
+          message: "Doctor profile not found",
+        });
+      }
+
+      if (record.doctorId.toString() !== doctor._id.toString()) {
+        return res.status(403).json({
+          success: false,
+          message: "You are not authorized to edit this medical record",
+        });
+      }
+
+      // Only allow editing the content fields — never patientId, doctorId, appointmentId
+      const { symptoms, diagnosis, treatmentNotes, prescription, followUpDate } =
+        req.body;
+
+      if (diagnosis !== undefined && !diagnosis.trim()) {
+        return res.status(400).json({
+          success: false,
+          message: "Diagnosis cannot be empty",
+        });
+      }
+
+      if (symptoms !== undefined) record.symptoms = symptoms;
+      if (diagnosis !== undefined) record.diagnosis = diagnosis;
+      if (treatmentNotes !== undefined) record.treatmentNotes = treatmentNotes;
+      if (prescription !== undefined) record.prescription = prescription;
+      if (followUpDate !== undefined)
+        record.followUpDate = followUpDate || null;
+
+      const updatedRecord = await record.save();
+
+      res.status(200).json({
+        success: true,
+        message: "Medical record updated successfully",
+        medicalRecord: updatedRecord,
+      });
+    } catch (error) {
+      console.error("Update medical record error:", error);
+
+      res.status(500).json({
+        success: false,
+        message: "Failed to update medical record",
+        error: error.message,
+      });
+    }
+  }
+);
+
+
 // ===============================
 // GET MEDICAL RECORD BY ID
 // ===============================

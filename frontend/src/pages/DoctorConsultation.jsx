@@ -148,14 +148,14 @@ function DoctorConsultation() {
       setSuccess("Medical record created successfully.");
 
       setTimeout(() => {
-        navigate("/doctor/records");
+        navigate("/doctor/appointments");
       }, 1200);
     } catch (err) {
       console.error("Create medical record error:", err);
 
       setError(
         err.response?.data?.message ||
-          "Failed to create medical record. Please try again."
+        "Failed to create medical record. Please try again."
       );
     } finally {
       setLoading(false);

@@ -34,7 +34,7 @@ function AdminAppointments() {
 
       setError(
         err.response?.data?.message ||
-          "Failed to load appointments. Please try again."
+        "Failed to load appointments. Please try again."
       );
     } finally {
       setLoading(false);
@@ -122,7 +122,7 @@ function AdminAppointments() {
 
       setError(
         err.response?.data?.message ||
-          "Failed to update appointment status."
+        "Failed to update appointment status."
       );
     } finally {
       setUpdatingId(null);
@@ -498,7 +498,7 @@ function AdminAppointments() {
                         <Clock3 size={16} />
 
                         {formatTime(
-                          appointment.appointmentTime
+                          appointment.startTime
                         )}
                       </div>
                     </div>
@@ -508,28 +508,46 @@ function AdminAppointments() {
                   <div className="flex shrink-0 flex-wrap gap-2 xl:w-52 xl:flex-col">
                     {appointment.status ===
                       "scheduled" && (
-                      <>
-                        <button
-                          onClick={() =>
-                            handleStatusChange(
-                              appointment._id,
-                              "confirmed"
-                            )
-                          }
-                          disabled={isUpdating}
-                          className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
-                        >
-                          {isUpdating ? (
-                            <RefreshCw
-                              size={16}
-                              className="animate-spin"
-                            />
-                          ) : (
-                            <CheckCircle2 size={16} />
-                          )}
-                          Confirm
-                        </button>
+                        <>
+                          <button
+                            onClick={() =>
+                              handleStatusChange(
+                                appointment._id,
+                                "confirmed"
+                              )
+                            }
+                            disabled={isUpdating}
+                            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            {isUpdating ? (
+                              <RefreshCw
+                                size={16}
+                                className="animate-spin"
+                              />
+                            ) : (
+                              <CheckCircle2 size={16} />
+                            )}
+                            Confirm
+                          </button>
 
+                          <button
+                            onClick={() =>
+                              handleStatusChange(
+                                appointment._id,
+                                "cancelled"
+                              )
+                            }
+                            disabled={isUpdating}
+                            className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-50 px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+                          >
+                            <XCircle size={16} />
+                            Cancel
+                          </button>
+                        </>
+                      )}
+
+                    {appointment.status ===
+                      "confirmed" && (
                         <button
                           onClick={() =>
                             handleStatusChange(
@@ -538,53 +556,35 @@ function AdminAppointments() {
                             )
                           }
                           disabled={isUpdating}
-                          className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-red-50 px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
+                          className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-50 px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
                         >
-                          <XCircle size={16} />
+                          {isUpdating ? (
+                            <RefreshCw
+                              size={16}
+                              className="animate-spin"
+                            />
+                          ) : (
+                            <XCircle size={16} />
+                          )}
                           Cancel
                         </button>
-                      </>
-                    )}
-
-                    {appointment.status ===
-                      "confirmed" && (
-                      <button
-                        onClick={() =>
-                          handleStatusChange(
-                            appointment._id,
-                            "cancelled"
-                          )
-                        }
-                        disabled={isUpdating}
-                        className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-50 px-4 py-2.5 text-sm font-medium text-red-600 transition hover:bg-red-100 disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        {isUpdating ? (
-                          <RefreshCw
-                            size={16}
-                            className="animate-spin"
-                          />
-                        ) : (
-                          <XCircle size={16} />
-                        )}
-                        Cancel
-                      </button>
-                    )}
+                      )}
 
                     {appointment.status ===
                       "completed" && (
-                      <div className="flex items-center justify-center gap-2 rounded-xl bg-purple-50 px-4 py-2.5 text-sm font-medium text-purple-600">
-                        <CheckCircle2 size={16} />
-                        Completed
-                      </div>
-                    )}
+                        <div className="flex items-center justify-center gap-2 rounded-xl bg-purple-50 px-4 py-2.5 text-sm font-medium text-purple-600">
+                          <CheckCircle2 size={16} />
+                          Completed
+                        </div>
+                      )}
 
                     {appointment.status ===
                       "cancelled" && (
-                      <div className="flex items-center justify-center gap-2 rounded-xl bg-red-50 px-4 py-2.5 text-sm font-medium text-red-600">
-                        <XCircle size={16} />
-                        Cancelled
-                      </div>
-                    )}
+                        <div className="flex items-center justify-center gap-2 rounded-xl bg-red-50 px-4 py-2.5 text-sm font-medium text-red-600">
+                          <XCircle size={16} />
+                          Cancelled
+                        </div>
+                      )}
                   </div>
                 </div>
               </div>

@@ -470,7 +470,7 @@ function BookAppointment() {
   const [services, setServices] = useState([]);
 
   const [bookedAppointments, setBookedAppointments] = useState([]);
-const [availabilityLoading, setAvailabilityLoading] = useState(false);
+  const [availabilityLoading, setAvailabilityLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     departmentId: "",
@@ -499,27 +499,27 @@ const [availabilityLoading, setAvailabilityLoading] = useState(false);
 
         setDepartments(
           departmentRes.data.departments ||
-            departmentRes.data.data ||
-            []
+          departmentRes.data.data ||
+          []
         );
 
         setDoctors(
           doctorRes.data.doctors ||
-            doctorRes.data.data ||
-            []
+          doctorRes.data.data ||
+          []
         );
 
         setServices(
           serviceRes.data.services ||
-            serviceRes.data.data ||
-            []
+          serviceRes.data.data ||
+          []
         );
       } catch (err) {
         console.error(err);
 
         setError(
           err.response?.data?.message ||
-            "Failed to load appointment data"
+          "Failed to load appointment data"
         );
       } finally {
         setLoading(false);
@@ -529,7 +529,6 @@ const [availabilityLoading, setAvailabilityLoading] = useState(false);
     loadData();
   }, []);
 
-  useEffect(() => {
   const loadBookedAppointments = async () => {
     if (
       !formData.doctorId ||
@@ -563,18 +562,19 @@ const [availabilityLoading, setAvailabilityLoading] = useState(false);
 
       setError(
         err.response?.data?.message ||
-          "Failed to load available time slots"
+        "Failed to load available time slots"
       );
     } finally {
       setAvailabilityLoading(false);
     }
   };
 
-  loadBookedAppointments();
-}, [
-  formData.doctorId,
-  formData.appointmentDate,
-]);
+  useEffect(() => {
+    loadBookedAppointments();
+  }, [
+    formData.doctorId,
+    formData.appointmentDate,
+  ]);
 
   const selectedDepartment = departments.find(
     (department) =>
@@ -598,7 +598,7 @@ const [availabilityLoading, setAvailabilityLoading] = useState(false);
     return doctors.filter(
       (doctor) =>
         doctor.departmentId?._id ===
-          formData.departmentId ||
+        formData.departmentId ||
         doctor.departmentId === formData.departmentId
     );
   }, [doctors, formData.departmentId]);
@@ -612,7 +612,7 @@ const [availabilityLoading, setAvailabilityLoading] = useState(false);
     return services.filter(
       (service) =>
         service.departmentId?._id ===
-          formData.departmentId ||
+        formData.departmentId ||
         service.departmentId === formData.departmentId
     );
   }, [services, formData.departmentId]);
@@ -679,95 +679,95 @@ const [availabilityLoading, setAvailabilityLoading] = useState(false);
 
 
   const timeSlots = useMemo(() => {
-  if (!selectedDateAvailability) {
-    return [];
-  }
+    if (!selectedDateAvailability) {
+      return [];
+    }
 
-  const start = selectedDateAvailability.startTime;
-  const end = selectedDateAvailability.endTime;
+    const start = selectedDateAvailability.startTime;
+    const end = selectedDateAvailability.endTime;
 
-  const duration = Number(
-    selectedService?.duration || 30
-  );
+    const duration = Number(
+      selectedService?.duration || 30
+    );
 
-  if (!duration || duration <= 0) {
-    return [];
-  }
+    if (!duration || duration <= 0) {
+      return [];
+    }
 
-  const [startHour, startMinute] = start
-    .split(":")
-    .map(Number);
-
-  const [endHour, endMinute] = end
-    .split(":")
-    .map(Number);
-
-  let currentMinutes =
-    startHour * 60 + startMinute;
-
-  const endMinutes =
-    endHour * 60 + endMinute;
-
-  const slots = [];
-
-  const timeToMinutes = (time) => {
-    const [hour, minute] = time
+    const [startHour, startMinute] = start
       .split(":")
       .map(Number);
 
-    return hour * 60 + minute;
-  };
+    const [endHour, endMinute] = end
+      .split(":")
+      .map(Number);
 
-  while (
-    currentMinutes + duration <=
-    endMinutes
-  ) {
-    const slotStart = currentMinutes;
-    const slotEnd =
-      currentMinutes + duration;
+    let currentMinutes =
+      startHour * 60 + startMinute;
 
-    const isBooked = bookedAppointments.some(
-      (appointment) => {
-        const bookedStart = timeToMinutes(
-          appointment.startTime
-        );
+    const endMinutes =
+      endHour * 60 + endMinute;
 
-        const bookedEnd = timeToMinutes(
-          appointment.endTime
-        );
+    const slots = [];
 
-        return (
-          slotStart < bookedEnd &&
-          slotEnd > bookedStart
-        );
-      }
-    );
+    const timeToMinutes = (time) => {
+      const [hour, minute] = time
+        .split(":")
+        .map(Number);
 
-    if (!isBooked) {
-      const hour = Math.floor(
-        currentMinutes / 60
+      return hour * 60 + minute;
+    };
+
+    while (
+      currentMinutes + duration <=
+      endMinutes
+    ) {
+      const slotStart = currentMinutes;
+      const slotEnd =
+        currentMinutes + duration;
+
+      const isBooked = bookedAppointments.some(
+        (appointment) => {
+          const bookedStart = timeToMinutes(
+            appointment.startTime
+          );
+
+          const bookedEnd = timeToMinutes(
+            appointment.endTime
+          );
+
+          return (
+            slotStart < bookedEnd &&
+            slotEnd > bookedStart
+          );
+        }
       );
 
-      const minute =
-        currentMinutes % 60;
+      if (!isBooked) {
+        const hour = Math.floor(
+          currentMinutes / 60
+        );
 
-      const time = `${String(hour).padStart(
-        2,
-        "0"
-      )}:${String(minute).padStart(2, "0")}`;
+        const minute =
+          currentMinutes % 60;
 
-      slots.push(time);
+        const time = `${String(hour).padStart(
+          2,
+          "0"
+        )}:${String(minute).padStart(2, "0")}`;
+
+        slots.push(time);
+      }
+
+      currentMinutes += duration;
     }
 
-    currentMinutes += duration;
-  }
-
-  return slots;
-}, [
-  selectedDateAvailability,
-  selectedService,
-  bookedAppointments,
-]);
+    return slots;
+  }, [
+    selectedDateAvailability,
+    selectedService,
+    bookedAppointments,
+  ]);
 
   const handleDepartmentChange = (e) => {
     const departmentId = e.target.value;
@@ -799,14 +799,14 @@ const [availabilityLoading, setAvailabilityLoading] = useState(false);
   };
 
   const handleServiceChange = (e) => {
-  setFormData({
-    ...formData,
-    serviceId: e.target.value,
-  });
+    setFormData({
+      ...formData,
+      serviceId: e.target.value,
+    });
 
-  setMessage("");
-  setError("");
-};
+    setMessage("");
+    setError("");
+  };
 
   const handleDateChange = (e) => {
     const dateValue = e.target.value;
@@ -924,9 +924,9 @@ const [availabilityLoading, setAvailabilityLoading] = useState(false);
         return;
       }
 
-      if (!formData.startTime) {
+      if (!formData.startTime || !timeSlots.includes(formData.startTime)) {
         setError(
-          "Please select an available time slot."
+          "Please select a valid available time slot."
         );
         return;
       }
@@ -939,6 +939,14 @@ const [availabilityLoading, setAvailabilityLoading] = useState(false);
       if (!formData.serviceId) {
         setError(
           "Please select a service."
+        );
+        return;
+      }
+
+      // Check if the service duration invalidated the previously selected time slot
+      if (!timeSlots.includes(formData.startTime)) {
+        setError(
+          "The selected service duration makes your previously chosen time slot unavailable. Please go back to Step 3 and select a different time."
         );
         return;
       }
@@ -970,7 +978,7 @@ const [availabilityLoading, setAvailabilityLoading] = useState(false);
 
       setMessage(
         response.data.message ||
-          "Appointment booked successfully!"
+        "Appointment booked successfully!"
       );
 
       setTimeout(() => {
@@ -981,10 +989,27 @@ const [availabilityLoading, setAvailabilityLoading] = useState(false);
     } catch (err) {
       console.error(err);
 
-      setError(
-        err.response?.data?.message ||
+      if (err.response?.status === 409) {
+        // Fix for 409 Conflict: Handle race conditions
+        const conflictMessage = err.response?.data?.message || "This time slot is no longer available. Please select another slot.";
+        setError(conflictMessage);
+
+        // Go back to the Date & Time step (step 3)
+        setStep(3);
+
+        // Clear the conflicting selected time
+        setFormData((prev) => ({ ...prev, startTime: "" }));
+
+        // Refresh doctor's availability
+        loadBookedAppointments();
+      } else if (err.response?.status === 500) {
+        setError("Something went wrong while booking your appointment. Please try again.");
+      } else {
+        setError(
+          err.response?.data?.message ||
           "Failed to book appointment"
-      );
+        );
+      }
     } finally {
       setBooking(false);
     }
@@ -1150,15 +1175,21 @@ const [availabilityLoading, setAvailabilityLoading] = useState(false);
                   key={label}
                   className="flex min-w-max flex-1 items-center"
                 >
-                  <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (completed || active) setStep(stepNumber);
+                    }}
+                    disabled={!completed && !active}
+                    className="flex items-center gap-2 outline-none transition disabled:cursor-not-allowed"
+                  >
                     <div
-                      className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold transition ${
-                        completed
-                          ? "bg-emerald-500 text-white"
-                          : active
+                      className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold transition ${completed
+                        ? "bg-emerald-500 text-white shadow-md hover:bg-emerald-600 cursor-pointer"
+                        : active
                           ? "bg-blue-600 text-white shadow-md"
                           : "bg-slate-100 text-slate-400"
-                      }`}
+                        }`}
                     >
                       {completed ? (
                         <CheckCircle2
@@ -1170,29 +1201,27 @@ const [availabilityLoading, setAvailabilityLoading] = useState(false);
                     </div>
 
                     <span
-                      className={`hidden text-xs font-semibold sm:block ${
-                        active
-                          ? "text-blue-700"
-                          : completed
+                      className={`hidden text-xs font-semibold sm:block ${active
+                        ? "text-blue-700"
+                        : completed
                           ? "text-emerald-600"
                           : "text-slate-400"
-                      }`}
+                        }`}
                     >
                       {label}
                     </span>
-                  </div>
+                  </button>
 
                   {index <
                     stepLabels.length -
-                      1 && (
-                    <div
-                      className={`mx-2 h-0.5 flex-1 ${
-                        completed
+                    1 && (
+                      <div
+                        className={`mx-2 h-0.5 flex-1 ${completed
                           ? "bg-emerald-400"
                           : "bg-slate-100"
-                      }`}
-                    />
-                  )}
+                          }`}
+                      />
+                    )}
                 </div>
               );
             }
@@ -1243,11 +1272,10 @@ const [availabilityLoading, setAvailabilityLoading] = useState(false);
                           },
                         })
                       }
-                      className={`rounded-2xl border p-5 text-left transition ${
-                        selected
-                          ? "border-blue-500 bg-blue-50 ring-4 ring-blue-100"
-                          : "border-slate-200 bg-white hover:border-blue-200 hover:bg-blue-50/40"
-                      }`}
+                      className={`rounded-2xl border p-5 text-left transition ${selected
+                        ? "border-blue-500 bg-blue-50 ring-4 ring-blue-100"
+                        : "border-slate-200 bg-white hover:border-blue-200 hover:bg-blue-50/40"
+                        }`}
                     >
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
@@ -1357,11 +1385,10 @@ const [availabilityLoading, setAvailabilityLoading] = useState(false);
                             },
                           })
                         }
-                        className={`rounded-2xl border p-5 text-left transition ${
-                          selected
-                            ? "border-violet-500 bg-violet-50 ring-4 ring-violet-100"
-                            : "border-slate-200 bg-white hover:border-violet-200 hover:bg-violet-50/40"
-                        }`}
+                        className={`rounded-2xl border p-5 text-left transition ${selected
+                          ? "border-violet-500 bg-violet-50 ring-4 ring-violet-100"
+                          : "border-slate-200 bg-white hover:border-violet-200 hover:bg-violet-50/40"
+                          }`}
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-100 text-violet-600">
@@ -1404,7 +1431,7 @@ const [availabilityLoading, setAvailabilityLoading] = useState(false);
 
                           <div className="mt-2 flex flex-wrap gap-2">
                             {available.length >
-                            0 ? (
+                              0 ? (
                               available.map(
                                 (
                                   item
@@ -1583,11 +1610,10 @@ const [availabilityLoading, setAvailabilityLoading] = useState(false);
 
                               setError("");
                             }}
-                            className={`rounded-xl border px-3 py-3 text-sm font-semibold transition ${
-                              selected
-                                ? "border-cyan-500 bg-cyan-50 text-cyan-700 ring-2 ring-cyan-100"
-                                : "border-slate-200 bg-white text-slate-600 hover:border-cyan-300 hover:bg-cyan-50"
-                            }`}
+                            className={`rounded-xl border px-3 py-3 text-sm font-semibold transition ${selected
+                              ? "border-cyan-500 bg-cyan-50 text-cyan-700 ring-2 ring-cyan-100"
+                              : "border-slate-200 bg-white text-slate-600 hover:border-cyan-300 hover:bg-cyan-50"
+                              }`}
                           >
                             {formatTime(
                               time
@@ -1668,7 +1694,7 @@ const [availabilityLoading, setAvailabilityLoading] = useState(false);
             </div>
 
             {filteredServices.length ===
-            0 ? (
+              0 ? (
               <div className="rounded-2xl border border-amber-200 bg-amber-50 p-6 text-center">
                 <ClipboardList
                   size={30}
@@ -1704,11 +1730,10 @@ const [availabilityLoading, setAvailabilityLoading] = useState(false);
                             },
                           })
                         }
-                        className={`rounded-2xl border p-5 text-left transition ${
-                          selected
-                            ? "border-cyan-500 bg-cyan-50 ring-4 ring-cyan-100"
-                            : "border-slate-200 bg-white hover:border-cyan-200 hover:bg-cyan-50/40"
-                        }`}
+                        className={`rounded-2xl border p-5 text-left transition ${selected
+                          ? "border-cyan-500 bg-cyan-50 ring-4 ring-cyan-100"
+                          : "border-slate-200 bg-white hover:border-cyan-200 hover:bg-cyan-50/40"
+                          }`}
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-cyan-100 text-cyan-600">

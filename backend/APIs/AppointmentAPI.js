@@ -7,6 +7,7 @@ import Service from "../models/ServiceModel.js";
 import verifyToken from "../Middlewares/verifyToken.js";
 import authorizeRoles from "../Middlewares/roleAuthorization.js";
 import Notification from "../models/NotificationModel.js";
+import MedicalRecord from "../models/MedicalRecordModel.js";
 
 const router = express.Router();
 
@@ -59,9 +60,7 @@ router.post(
         !serviceId ||
         !appointmentDate ||
         !startTime
-      )
-      
-       {
+      ) {
         return res.status(400).json({
           success: false,
           message:
@@ -299,24 +298,29 @@ router.post(
         status: "scheduled",
       });
 
-      
-// Notification for the person who booked the appointment
-await Notification.create({
-  userId: req.user._id,
-  type: "appointment_booked",
-  title: "Appointment Booked",
-  message: `Your appointment has been booked successfully for ${appointment.appointmentDate} at ${appointment.startTime}.`,
-  appointmentId: appointment._id,
-});
 
-// Notification for the selected doctor
-await Notification.create({
-  userId: doctor.userId,
-  type: "new_appointment",
-  title: "New Appointment",
-  message: `You have a new appointment scheduled for ${appointment.appointmentDate} at ${appointment.startTime}.`,
-  appointmentId: appointment._id,
-});
+      // Attempt to create notifications without failing the main request if they fail
+      try {
+        // Notification for the person who booked the appointment
+        await Notification.create({
+          userId: req.user._id,
+          type: "appointment_booked",
+          title: "Appointment Booked",
+          message: `Your appointment has been booked successfully for ${appointment.appointmentDate.toDateString()} at ${appointment.startTime}.`,
+          appointmentId: appointment._id,
+        });
+
+        // Notification for the selected doctor
+        await Notification.create({
+          userId: doctor.userId,
+          type: "appointment_booked", // Fixed invalid type "new_appointment"
+          title: "New Appointment",
+          message: `You have a new appointment scheduled for ${appointment.appointmentDate.toDateString()} at ${appointment.startTime}.`,
+          appointmentId: appointment._id,
+        });
+      } catch (notificationError) {
+        console.error("Failed to create notifications for appointment:", notificationError);
+      }
 
 
 
@@ -326,6 +330,17 @@ await Notification.create({
         appointment,
       });
     } catch (error) {
+      console.error("Appointment creation error:", error);
+      console.error("Appointment request:", {
+        patientId: req.body.patientId,
+        doctorId: req.body.doctorId,
+        departmentId: req.body.departmentId,
+        serviceId: req.body.serviceId,
+        appointmentDate: req.body.appointmentDate,
+        startTime: req.body.startTime,
+        userId: req.user?._id
+      });
+
       res.status(500).json({
         success: false,
         message: "Failed to book appointment",
@@ -422,16 +437,35 @@ router.get(
           },
         })
         .populate("departmentId", "name")
-        .populate("serviceId", "name duration")
+        .populate("serviceId", "name price duration")
         .sort({
           appointmentDate: -1,
           startTime: -1,
         });
 
+      // Bulk-fetch which appointments already have a medical record
+      const appointmentIds = appointments.map((a) => a._id);
+      const existingRecords = await MedicalRecord.find({
+        appointmentId: { $in: appointmentIds },
+      }).select("appointmentId");
+
+      const recordedAppointmentIds = new Set(
+        existingRecords.map((r) => r.appointmentId.toString())
+      );
+
+      // Stamp hasMedicalRecord on each appointment
+      const appointmentsWithFlag = appointments.map((appt) => {
+        const obj = appt.toObject();
+        obj.hasMedicalRecord = recordedAppointmentIds.has(
+          appt._id.toString()
+        );
+        return obj;
+      });
+
       res.status(200).json({
         success: true,
-        count: appointments.length,
-        appointments,
+        count: appointmentsWithFlag.length,
+        appointments: appointmentsWithFlag,
       });
     } catch (error) {
       res.status(500).json({

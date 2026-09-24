@@ -12,6 +12,7 @@ import {
   LogOut,
   UserCircle,
   X,
+  Bot
 } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
 
@@ -48,6 +49,11 @@ function Sidebar({ role, mobileOpen, setMobileOpen }) {
       name: "Notifications",
       path: "/patient/notifications",
       icon: Bell,
+    },
+    {
+      name: "AI Assistant",
+      path: "/patient/ai-assistant",
+      icon: Bot,
     },
   ];
 
@@ -122,12 +128,42 @@ function Sidebar({ role, mobileOpen, setMobileOpen }) {
     },
   ];
 
+  const receptionistLinks = [
+    {
+      name: "Dashboard",
+      path: "/receptionist",
+      icon: LayoutDashboard,
+    },
+    {
+      name: "Patients",
+      path: "/receptionist/patients",
+      icon: Users,
+    },
+    {
+      name: "Appointments",
+      path: "/receptionist/appointments",
+      icon: CalendarDays,
+    },
+    {
+      name: "Invoices",
+      path: "/receptionist/invoices",
+      icon: Receipt,
+    },
+    {
+      name: "Notifications",
+      path: "/receptionist/notifications",
+      icon: Bell,
+    },
+  ];
+
   const links =
     role === "patient"
       ? patientLinks
       : role === "doctor"
-      ? doctorLinks
-      : adminLinks;
+        ? doctorLinks
+        : role === "receptionist"
+          ? receptionistLinks
+          : adminLinks;
 
   const handleLogout = () => {
     localStorage.removeItem("medassist_token");
@@ -146,9 +182,8 @@ function Sidebar({ role, mobileOpen, setMobileOpen }) {
       )}
 
       <aside
-        className={`fixed left-0 top-0 z-50 flex h-screen w-64 flex-col bg-white shadow-[4px_0_18px_rgba(15,23,42,0.06)] transition-transform duration-300 lg:translate-x-0 ${
-          mobileOpen ? "translate-x-0" : "-translate-x-full"
-        }`}
+        className={`fixed left-0 top-0 z-50 flex h-screen w-64 flex-col bg-white shadow-[4px_0_18px_rgba(15,23,42,0.06)] transition-transform duration-300 lg:translate-x-0 ${mobileOpen ? "translate-x-0" : "-translate-x-full"
+          }`}
       >
         {/* BRAND */}
         <div className="flex h-16 items-center justify-between px-5">
@@ -191,10 +226,9 @@ function Sidebar({ role, mobileOpen, setMobileOpen }) {
                 end={link.path === `/${role}`}
                 onClick={() => setMobileOpen(false)}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition ${
-                    isActive
-                      ? "bg-blue-600 text-white shadow-sm"
-                      : "text-gray-600 hover:bg-slate-100 hover:text-gray-900"
+                  `flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition ${isActive
+                    ? "bg-blue-600 text-white shadow-sm"
+                    : "text-gray-600 hover:bg-slate-100 hover:text-gray-900"
                   }`
                 }
               >

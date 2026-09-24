@@ -19,6 +19,7 @@ import Notifications from "./pages/Notifications";
 import MyInvoices from "./pages/MyInvoices";
 import MedicalRecords from "./pages/MedicalRecords";
 import Profile from "./pages/Profile";
+import AIHealthAssistant from "./pages/AIHealthAssistant";
 import DoctorAppointments from "./pages/DoctorAppointments";
 import DoctorPatients from "./pages/DoctorPatients";
 import DoctorMedicalRecords from "./pages/DoctorMedicalRecords";
@@ -31,6 +32,11 @@ import AdminServices from "./pages/AdminServices";
 import AdminAppointments from "./pages/AdminAppointments";
 import AdminInvoices from "./pages/AdminInvoices";
 import AdminNotifications from "./pages/AdminNotifications";
+import ReceptionistPatients from "./pages/ReceptionistPatients";
+import ReceptionistAppointments from "./pages/ReceptionistAppointments";
+import ReceptionistCreateAppointment from "./pages/ReceptionistCreateAppointment";
+import ReceptionistInvoices from "./pages/ReceptionistInvoices";
+import ReceptionistProfile from "./pages/ReceptionistProfile";
 
 import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardLayout from "./layouts/DashboardLayout";
@@ -63,39 +69,39 @@ function App() {
           <Route path="departments" element={<AdminDepartments />} />
           <Route path="services" element={<AdminServices />} />
           <Route
-    path="appointments"
-    element={<AdminAppointments />}
-  />
-  <Route
-  path="invoices"
-  element={<AdminInvoices />}
-/>
-<Route
-  path="notifications"
-  element={<AdminNotifications />}
-/>
+            path="appointments"
+            element={<AdminAppointments />}
+          />
+          <Route
+            path="invoices"
+            element={<AdminInvoices />}
+          />
+          <Route
+            path="notifications"
+            element={<AdminNotifications />}
+          />
         </Route>
 
 
         {/* ==================== DOCTOR ==================== */}
 
         <Route
-  path="/doctor"
-  element={
-    <ProtectedRoute allowedRoles={["doctor"]}>
-      <DashboardLayout role="doctor" />
-    </ProtectedRoute>
-  }
->
-  <Route index element={<DoctorDashboard />} />
-  <Route path="appointments" element={<DoctorAppointments />} />
-  <Route path="patients" element={<DoctorPatients />} />
-  <Route path="records" element={<DoctorMedicalRecords />} />
-  <Route path="notifications" element={<DoctorNotifications />} />
-  <Route path="consultation" element={<DoctorConsultation />} />
-  <Route path="profile" element={<DoctorProfile />} />
-  
-</Route>
+          path="/doctor"
+          element={
+            <ProtectedRoute allowedRoles={["doctor"]}>
+              <DashboardLayout role="doctor" />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<DoctorDashboard />} />
+          <Route path="appointments" element={<DoctorAppointments />} />
+          <Route path="patients" element={<DoctorPatients />} />
+          <Route path="records" element={<DoctorMedicalRecords />} />
+          <Route path="notifications" element={<DoctorNotifications />} />
+          <Route path="consultation" element={<DoctorConsultation />} />
+          <Route path="profile" element={<DoctorProfile />} />
+
+        </Route>
 
 
         {/* ==================== PATIENT ==================== */}
@@ -136,6 +142,11 @@ function App() {
           />
 
           <Route
+            path="ai-assistant"
+            element={<AIHealthAssistant />}
+          />
+
+          <Route
             path="profile"
             element={<Profile />}
           />
@@ -153,6 +164,27 @@ function App() {
           }
         >
           <Route index element={<ReceptionistDashboard />} />
+          <Route path="patients" element={<ReceptionistPatients />} />
+          <Route
+            path="appointments"
+            element={<ReceptionistAppointments />}
+          />
+          <Route
+            path="appointments/create"
+            element={<ReceptionistCreateAppointment />}
+          />
+          <Route
+            path="invoices"
+            element={<ReceptionistInvoices />}
+          />
+          <Route
+            path="notifications"
+            element={<Notifications />}
+          />
+          <Route
+            path="profile"
+            element={<ReceptionistProfile />}
+          />
         </Route>
 
 

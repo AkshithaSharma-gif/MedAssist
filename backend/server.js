@@ -13,6 +13,7 @@ import medicalRecordRouter from "./APIs/MedicalRecordAPI.js";
 import invoiceRouter from "./APIs/InvoiceAPI.js";
 import dashboardRouter from "./APIs/DashboardAPI.js";
 import notificationRouter from "./APIs/NotificationAPI.js";
+import aiRouter from "./APIs/AIAPI.js";
 
 import connectDB from "./config/db.js";
 
@@ -26,7 +27,13 @@ const PORT = process.env.PORT || 5000;
 
 
 // Middlewares
-app.use(cors());
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  exposedHeaders: ["Authorization"],
+  optionsSuccessStatus: 204,
+}));
 app.use(express.json());
 app.use(morgan("dev"));
 
@@ -42,6 +49,7 @@ app.use("/api/medical-records", medicalRecordRouter);
 app.use("/api/invoices", invoiceRouter);
 app.use("/api/dashboard", dashboardRouter);
 app.use("/api/notifications", notificationRouter);
+app.use("/api/ai", aiRouter);
 
 
 // Test route
